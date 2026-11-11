@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<!--
+  SMCK Family Trip Packing — Shanghai (de-identified public build)
+  Public de-identified build. Roles not names; no dates, hotel, policy or medication names.
+  The full named version stays private.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SMCK Pack">
+<title>Packing · Shanghai · SMCK</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Nunito:wght@400;600;700&family=Caveat:wght@400;600&display=swap');
+
+:root {
+  --navy: #1D2B4F;
+  --lavender: #C5B4E3;
+  --pink: #F19FC2;
+  --pearl: #FAF8FF;
+  --ink: #1A1A2E;
+  --mist: #EDE8F7;
+  --buy: #D4574F;
+  --must: #C29B3E;
+  --lastmin: #4B8B95;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; background: var(--pearl); }
+body {
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--ink); font-size: 14px; line-height: 1.45;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) calc(env(safe-area-inset-bottom) + 1rem) env(safe-area-inset-left);
+}
+
+header {
+  background: var(--navy); color: var(--pearl);
+  padding: 1.4rem 1rem 1rem;
+}
+header .brand { font-family: 'Caveat', cursive; font-size: 1.25rem; color: var(--lavender); }
+header h1 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 1.7rem; margin: 0.2rem 0 0.1rem; }
+header .meta { font-size: 0.7rem; color: var(--lavender); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; }
+
+.bar {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--pearl); padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid var(--mist);
+}
+.bar .row { display: flex; gap: 0.5rem; align-items: center; }
+.bar .row + .row { margin-top: 0.5rem; }
+.bar .pct { font-weight: 700; font-size: 0.75rem; color: var(--navy); min-width: 38px; text-align: right; }
+.bar .track { flex: 1; height: 5px; background: var(--mist); border-radius: 3px; overflow: hidden; }
+.bar .fill { height: 100%; background: linear-gradient(90deg, var(--pink), var(--navy)); width: 0; transition: width 0.3s; }
+.bar .reset { background: transparent; border: 1px solid var(--lavender); color: var(--navy); padding: 0.2rem 0.5rem; font-size: 0.7rem; border-radius: 4px; cursor: pointer; font-weight: 600; }
+.bar button.tab { flex: 1; background: transparent; border: 1.5px solid var(--lavender); color: var(--navy); font-family: 'Nunito'; font-weight: 600; font-size: 0.8rem; padding: 0.4rem 0.6rem; border-radius: 6px; cursor: pointer; }
+.bar button.tab.active { background: var(--navy); color: var(--pearl); border-color: var(--navy); }
+.bar .filters { display: flex; gap: 0.3rem; overflow-x: auto; padding-bottom: 0.15rem; }
+.bar .filters button { flex: 0 0 auto; background: transparent; border: 1px solid var(--lavender); color: var(--navy); font-family: 'Nunito'; font-weight: 600; font-size: 0.72rem; padding: 0.32rem 0.7rem; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+.bar .filters button.active { background: var(--navy); color: var(--pearl); border-color: var(--navy); }
+.bar .filters button.buy-f { border-color: var(--buy); color: var(--buy); }
+.bar .filters button.buy-f.active { background: var(--buy); color: white; }
+.bar .filters button.must-f { border-color: var(--must); color: var(--must); }
+.bar .filters button.must-f.active { background: var(--must); color: white; }
+.bar .filters button.lastmin-f { border-color: var(--lastmin); color: var(--lastmin); }
+.bar .filters button.lastmin-f.active { background: var(--lastmin); color: white; }
+
+main { padding: 0.6rem 0.6rem 4rem; max-width: 920px; margin: 0 auto; }
+
+.cat-head {
+  font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 1.15rem;
+  color: var(--navy); margin: 1rem 0 0.35rem; padding: 0 0.3rem;
+  border-bottom: 1.5px solid var(--lavender);
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.cat-head .ct { font-family: 'Nunito'; font-size: 0.65rem; color: var(--navy); opacity: 0.55; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
+
+table.matrix { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 0 var(--mist); }
+table.matrix th, table.matrix td { padding: 0.4rem 0.25rem; text-align: center; font-size: 0.78rem; border-bottom: 1px solid var(--mist); }
+table.matrix thead th { background: var(--mist); color: var(--navy); font-family: 'Nunito'; font-weight: 700; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.5rem 0.2rem; }
+table.matrix .col-check { width: 28px; }
+table.matrix .col-item { text-align: left; padding-left: 0.55rem; font-size: 0.85rem; color: var(--ink); min-width: 130px; }
+table.matrix .col-must { width: 22px; }
+table.matrix tbody tr { cursor: pointer; }
+table.matrix tbody tr:hover { background: var(--mist); }
+table.matrix .box { width: 18px; height: 18px; border: 2px solid var(--navy); border-radius: 4px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+table.matrix .box::after { content: "✓"; color: var(--pearl); font-weight: 700; font-size: 0.75rem; opacity: 0; }
+table.matrix tr.done .box { background: var(--navy); }
+table.matrix tr.done .box::after { opacity: 1; }
+table.matrix tr.done .col-item { color: var(--lavender); text-decoration: line-through; }
+table.matrix tr.buy .box { border-color: var(--buy); }
+table.matrix tr.buy.done .box { background: var(--buy); }
+table.matrix tr.buy .col-item::before { content: "🛍 "; }
+table.matrix tr.must .col-must::after { content: "⭐"; font-size: 0.85rem; }
+table.matrix tr.lastmin .box { border-color: var(--lastmin); }
+table.matrix tr.lastmin.done .box { background: var(--lastmin); }
+table.matrix tr.lastmin .col-item::after { content: " ⏰"; font-size: 0.7rem; opacity: 0.75; }
+table.matrix .qty { color: var(--ink); font-weight: 600; }
+table.matrix .qty-fam { color: var(--navy); font-weight: 700; background: rgba(197,180,227,0.18); }
+table.matrix td.empty { color: var(--lavender); opacity: 0.4; }
+table.matrix td.qty { cursor: pointer; }
+table.matrix .qty.cell-done { background: var(--navy); color: var(--pearl); font-weight: 700; text-decoration: line-through; }
+table.matrix .qty.qty-fam.cell-done { background: var(--lavender); color: var(--navy); }
+table.matrix tr.partial .box { background: linear-gradient(135deg, var(--navy) 0 50%, transparent 50% 100%); }
+table.matrix tr.partial .box::after { content: ""; }
+table.matrix .note { display: block; font-size: 0.65rem; color: var(--lavender); margin-top: 0.1rem; }
+
+.person-tabs {
+  display: flex; gap: 0.35rem; padding: 0.5rem 0; overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.person-tabs button {
+  flex: 0 0 auto; background: white; border: 1.5px solid var(--lavender); color: var(--navy);
+  font-family: 'Nunito'; font-weight: 600; font-size: 0.78rem;
+  padding: 0.4rem 0.85rem; border-radius: 999px; cursor: pointer; white-space: nowrap;
+}
+.person-tabs button.active { background: var(--pink); color: var(--ink); border-color: var(--pink); }
+.person-tabs button[data-p="family"].active { background: var(--lavender); color: var(--navy); border-color: var(--lavender); }
+.person-tabs button[data-p="partner"].active,
+.person-tabs button[data-p="me"].active { background: var(--navy); color: var(--pearl); border-color: var(--navy); }
+.person-tabs button.all-packed:not(.active) { background: rgba(126, 209, 144, 0.18); border-color: #5eb96e; color: #2e6f3a; }
+.person-tabs button.all-packed::after { content: " ✓"; }
+
+.person-list { padding: 0 0.3rem; }
+.person-cat { background: white; border: 1px solid var(--mist); border-radius: 8px; margin-bottom: 0.9rem; overflow: hidden; }
+.person-cat .ph { background: var(--mist); padding: 0.65rem 0.9rem; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 1.1rem; color: var(--navy); display: flex; justify-content: space-between; align-items: baseline; }
+.person-cat .ph .pc { font-family: 'Nunito'; font-size: 0.65rem; color: var(--navy); opacity: 0.55; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
+.person-cat ul { list-style: none; margin: 0; padding: 0; }
+.person-cat li { display: flex; align-items: center; gap: 0.7rem; padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--mist); cursor: pointer; }
+.person-cat li:last-child { border-bottom: none; }
+.person-cat li:active { background: var(--mist); }
+.person-cat li .box { flex: 0 0 20px; width: 20px; height: 20px; border: 2px solid var(--navy); border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+.person-cat li .box::after { content: "✓"; color: var(--pearl); font-weight: 700; font-size: 0.82rem; opacity: 0; }
+.person-cat li.done .box { background: var(--navy); }
+.person-cat li.done .box::after { opacity: 1; }
+.person-cat li.done .text { color: var(--lavender); text-decoration: line-through; }
+.person-cat li.buy .box { border-color: var(--buy); }
+.person-cat li.buy.done .box { background: var(--buy); }
+.person-cat li.lastmin .box { border-color: var(--lastmin); }
+.person-cat li.lastmin.done .box { background: var(--lastmin); }
+.person-cat li .text { flex: 1; font-size: 0.92rem; }
+.person-cat li .text .qty { font-weight: 700; color: var(--navy); margin-right: 0.3rem; }
+.person-cat li .text .badge { display: inline-block; margin-left: 0.35rem; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.1rem 0.4rem; border-radius: 3px; }
+.person-cat li .text .badge-buy { background: var(--buy); color: white; }
+.person-cat li .text .badge-must { background: var(--must); color: white; }
+.person-cat li .text .badge-lastmin { background: var(--lastmin); color: white; }
+
+.footer-note { text-align: center; font-family: 'Caveat', cursive; font-size: 1.05rem; color: var(--lavender); margin-top: 1.4rem; padding: 0.5rem 0; }
+
+[hidden] { display: none !important; }
+
+@media print {
+  .bar { position: static; }
+  body { background: white; padding: 0.8cm; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">the SMCK suitcase</div>
+  <h1>Packing · Shanghai</h1>
+  <div class="meta">Cold trip · 8D7N · bring plug adapters</div>
+</header>
+
+<div class="bar">
+  <div class="row">
+    <span class="pct" id="pct">0%</span>
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <button class="reset" onclick="resetAll()">Reset</button>
+  </div>
+  <div class="row">
+    <button class="tab active" data-view="matrix">📊 Matrix</button>
+    <button class="tab" data-view="person">👤 Per person</button>
+  </div>
+  <div class="row filters">
+    <button data-f="all" class="active">All</button>
+    <button data-f="topack">To pack</button>
+    <button data-f="done">Packed</button>
+    <button data-f="buy" class="buy-f">🛍 To buy</button>
+    <button data-f="must" class="must-f">⭐ Must</button>
+    <button data-f="lastmin" class="lastmin-f">⏰ Last min</button>
+  </div>
+</div>
+
+<main>
+  <div id="matrix-view"></div>
+  <div id="person-view" hidden>
+    <div class="person-tabs" id="person-tabs"></div>
+    <div class="person-list" id="person-list"></div>
+  </div>
+</main>
+
+<div class="footer-note">have a beautiful trip ✶</div>
+
+<script>
+const STORE_KEY = 'smck-pack-shanghai-v1';
+
+const PEOPLE = [
+  {key: 'family', label: 'Family', short: 'Fam'},
+  {key: 'me', label: 'Me', short: 'Me'},
+  {key: 'partner', label: 'Partner', short: 'Ptnr'},
+  {key: 'boy', label: 'Big boy', short: 'Boy'},
+  {key: 'girl', label: 'Big girl', short: 'Girl'},
+  {key: 'bub', label: 'Little one', short: 'Bub'},
+];
+
+// 8-day cold trip: underwear/socks = days+2 = 10 · coffee/UHT = days×2 = 16 · diapers = days×6 = 48 · warm layers per the outfit plan
+const ITEMS = [
+  // ---------- To buy / check before ----------
+  {id:"b-pjs", cat:"🛍 To buy / check", name:"Big boy's warm PJs (ordered — pack when they arrive)", qty:{boy:2}, must:true, note:"ordered online, about 5 days' delivery"},
+  {id:"b-online", cat:"🛍 To buy / check", name:"Online order to the apartment: 2 kids' fleece jackets + big girl's fleece leggings + big boy's fleece pants", qty:{family:1}, tag:"buy", note:"collect at check-in — don't pack them"},
+  {id:"b-adapters", cat:"🛍 To buy / check", name:"Plug adapters (two flat pins / angled pins)", qty:{family:3}, tag:"buy", must:true, note:"different plug from home this time"},
+  {id:"b-esim", cat:"🛍 To buy / check", name:"eSIM + VPN — installed and TESTED at home", qty:{family:1}, tag:"buy", must:true, note:"not in the arrivals hall"},
+  {id:"b-pay", cat:"🛍 To buy / check", name:"Mobile wallet linked to a Visa/Mastercard (both phones)", qty:{family:1}, tag:"buy", must:true, note:"the city is effectively cashless"},
+  {id:"b-diapers", cat:"🛍 To buy / check", name:"Top up diapers to 48", qty:{family:1}, tag:"buy", must:true, note:"rule: days × 6. Cut on the day if she's genuinely night-only — that's a packing-day call"},
+  {id:"b-warmers", cat:"🛍 To buy / check", name:"❄️ Hand warmers ×20", qty:{family:20}, tag:"buy", note:"the early park gate, the riverfront at dusk, stroller footwells"},
+  {id:"b-ponchos", cat:"🛍 To buy / check", name:"❄️ Rain ponchos", qty:{family:5}, tag:"buy", note:"damp month — umbrellas don't work with strollers"},
+  {id:"b-raincovers", cat:"🛍 To buy / check", name:"❄️ Stroller rain covers + footmuffs/blankets", qty:{family:2}, tag:"buy", note:"strollers double as nap pods and windbreaks"},
+  {id:"b-handcream", cat:"🛍 To buy / check", name:"❄️ Hand cream + lip balm for everyone", qty:{family:1}, tag:"buy", note:"dry cold cracks lips within a day"},
+  {id:"b-gripsocks", cat:"🛍 To buy / check", name:"Anti-slip grip socks ×5", qty:{family:5}, tag:"buy", note:"pack them just in case — indoor playrooms"},
+  {id:"b-cash", cat:"🛍 To buy / check", name:"Small local cash (backup)", qty:{family:1}, tag:"buy", note:"boats and small stalls"},
+  {id:"b-plane", cat:"🛍 To buy / check", name:"Plane activities — buy any you don't already have", qty:{family:1}, tag:"buy", note:"see the Plane activities list"},
+  {id:"b-sunscreen", cat:"🛍 To buy / check", name:"Sunscreen — check you're not down to the dregs", qty:{family:1}, tag:"buy", note:"outdoors all day at the theme park"},
+
+  // ---------- Clothes (outfit plan: navy · cream · camel · red) ----------
+  {id:"c-coat", cat:"👕 Clothes", name:"❄️ Coat (hooded, water-resistant)", qty:{partner:1,me:1,boy:1,girl:1,bub:1}, must:true, lastmin:true, note:"in the CARRY-ON — on before leaving the plane. Navy / camel / navy / red / red"},
+  {id:"c-creamknit", cat:"👕 Clothes", name:"Cream knit (photo days only)", qty:{partner:1,me:1,boy:1,girl:1,bub:1}, note:"photo days only, so it stays clean"},
+  {id:"c-navyknit", cat:"👕 Clothes", name:"Navy knit / fleece (everyday)", qty:{partner:1,me:1,boy:1,girl:1,bub:2}},
+  {id:"c-thermtop", cat:"👕 Clothes", name:"❄️ Thermal tops", qty:{partner:4,me:4,boy:4,girl:4,bub:5}, note:"each worn 2 days"},
+  {id:"c-thermleg", cat:"👕 Clothes", name:"❄️ Thermal leggings", qty:{partner:3,me:3,boy:3,girl:3,bub:4}},
+  {id:"c-tees", cat:"👕 Clothes", name:"Long-sleeve tees", qty:{partner:4,me:4,boy:4,girl:4,bub:5}},
+  {id:"c-bottoms", cat:"👕 Clothes", name:"Bottoms (dark jeans / navy)", qty:{partner:3,me:3,boy:3,girl:3,bub:4}},
+  {id:"c-red", cat:"👕 Clothes", name:"Red accent (scarf / scarf / beanie)", qty:{partner:1,me:1,boy:1}},
+  {id:"c-beanie", cat:"👕 Clothes", name:"❄️ Beanie + gloves", qty:{partner:1,me:1,boy:1,girl:1,bub:1}, note:"little one: mittens on a string"},
+  {id:"c-und", cat:"👕 Clothes", name:"Underwear", qty:{partner:10,me:10,boy:10,girl:10,bub:10}, note:"days + 2 · little one — if out of diapers"},
+  {id:"c-socks", cat:"👕 Clothes", name:"❄️ Warm socks", qty:{partner:10,me:10,boy:10,girl:10,bub:10}, note:"days + 2"},
+  {id:"c-pjs", cat:"👕 Clothes", name:"Warm PJs", qty:{partner:1,me:1,boy:2,girl:2,bub:2}},
+  {id:"c-shoes", cat:"👕 Clothes", name:"Shoes: waterproof (worn) + spare pair", qty:{partner:2,me:2,boy:2,girl:2,bub:2}, note:"wet shoes don't dry overnight"},
+  {id:"c-slip", cat:"👕 Clothes", name:"Slippers", qty:{partner:1,me:1,boy:1,girl:1,bub:1}, note:"apartment floors"},
+  {id:"c-hats", cat:"👕 Clothes", name:"Sun hats", qty:{partner:1,me:1,boy:1,girl:1,bub:1}, note:"your 'always' rule — on a grey day the beanies do the job; packing-day call"},
+  {id:"c-sun", cat:"👕 Clothes", name:"Sunglasses", qty:{partner:1,me:1}},
+  {id:"c-hairties", cat:"👕 Clothes", name:"Hair ties", qty:{me:2,girl:8}, must:true, note:"big girl's standing item"},
+  {id:"c-spare", cat:"👕 Clothes", name:"Spare outfit in the day bag", qty:{bub:1}, must:true, note:"every day, plus the mittens"},
+  {id:"c-easyoff", cat:"👕 Clothes", name:"Easy-off top for the banquet night", qty:{family:1}, note:"you change into a costume they provide — wear it over a thermal"},
+
+  // ---------- Swim ----------
+  {id:"s-swim", cat:"🏊 Swim", name:"Swimsuits", qty:{partner:2,me:2,boy:2,girl:2,bub:2}, note:"4+ day rule · indoor heated pools at both hotels"},
+  {id:"s-waterdiapers", cat:"🏊 Swim", name:"Water diapers", qty:{bub:5}, note:"fixed rule"},
+  {id:"s-goggles", cat:"🏊 Swim", name:"Goggles", qty:{boy:1,girl:1}},
+  {id:"s-wetbags", cat:"🏊 Swim", name:"Wet bags", qty:{family:5}, note:"the pool is on hotel-move day, so swimsuits travel wet"},
+
+  // ---------- Toiletries ----------
+  {id:"t-facialbag", cat:"🧴 Toiletries", name:"Facial bag (full sub-list)", qty:{me:1}, must:true},
+  {id:"t-mist", cat:"🧴 Toiletries", name:"Facial mist spray", qty:{me:1}},
+  {id:"t-contacts", cat:"🧴 Toiletries", name:"Contact lenses + solution + case", qty:{me:"set"}, must:true, lastmin:true},
+  {id:"t-glasses", cat:"🧴 Toiletries", name:"Backup spectacles", qty:{partner:1,me:1}, must:true, lastmin:true},
+  {id:"t-toothbrush", cat:"🧴 Toiletries", name:"Toothbrush", qty:{partner:1,me:1,boy:1,girl:1,bub:1}, lastmin:true},
+  {id:"t-toothpaste", cat:"🧴 Toiletries", name:"Toothpaste", qty:{family:2}, lastmin:true},
+  {id:"t-floss", cat:"🧴 Toiletries", name:"Floss picks", qty:{boy:10,girl:10}},
+  {id:"t-hairbrush", cat:"🧴 Toiletries", name:"Hairbrush", qty:{me:1,girl:1}, lastmin:true},
+  {id:"t-soap", cat:"🧴 Toiletries", name:"Soap", qty:{family:1}},
+  {id:"t-shampoo", cat:"🧴 Toiletries", name:"Shampoo", qty:{family:1}},
+  {id:"t-facialwash", cat:"🧴 Toiletries", name:"Facial wash", qty:{me:1}, lastmin:true},
+  {id:"t-moist", cat:"🧴 Toiletries", name:"❄️ Body moisturiser — the rich one", qty:{family:1}, note:"heated rooms + dry cold are hard on eczema"},
+  {id:"t-lipbalm", cat:"🧴 Toiletries", name:"❄️ Lip balm", qty:{family:5}},
+  {id:"t-handcream", cat:"🧴 Toiletries", name:"❄️ Hand cream", qty:{family:2}},
+  {id:"t-eczema", cat:"🧴 Toiletries", name:"Eczema creams ×3 (prescription)", qty:{boy:"set"}, must:true},
+  {id:"t-retainer", cat:"🧴 Toiletries", name:"Retainer box + brush", qty:{boy:1}, must:true, lastmin:true},
+  {id:"t-nasal", cat:"🧴 Toiletries", name:"Nasal sprays (prescription)", qty:{me:1,boy:1,girl:1}, must:true, note:"big girl's is nightly"},
+  {id:"t-sunscreen", cat:"🧴 Toiletries", name:"Sunscreen", qty:{family:1}},
+  {id:"t-sanitiser", cat:"🧴 Toiletries", name:"Hand sanitiser", qty:{family:2}},
+  {id:"t-wipes", cat:"🧴 Toiletries", name:"Wet wipes", qty:{family:4}},
+  {id:"t-tissues", cat:"🧴 Toiletries", name:"Tissues", qty:{family:4}},
+  {id:"t-laundry", cat:"🧴 Toiletries", name:"Travel laundry sachets", qty:{family:2}, note:"the apartment has a washer"},
+
+  // ---------- Little one's block ----------
+  {id:"l-diapers", cat:"👶 Little one", name:"Diapers", qty:{bub:48,girl:5}, must:true, note:"little one: days × 6. The big girl's 5 are for out-and-about, not night"},
+  {id:"l-toiletcovers", cat:"👶 Little one", name:"Toilet covers", qty:{family:10}, must:true, note:"up from 5 — 8 days, and squat toilets out of town and at the parks"},
+  {id:"l-diapercream", cat:"👶 Little one", name:"Diaper cream", qty:{bub:1}},
+  {id:"l-mat", cat:"👶 Little one", name:"Changing mat", qty:{bub:1}, must:true},
+  {id:"l-cribsheets", cat:"👶 Little one", name:"Crib sheets", qty:{bub:2}, must:true, note:"comfort item + crib sheets + sleep sack"},
+  {id:"l-sleepsack", cat:"👶 Little one", name:"❄️ Sleep sack — the warm ones", qty:{bub:2}, must:true},
+  {id:"l-waterproof", cat:"👶 Little one", name:"Waterproof sheet", qty:{bub:1}},
+  {id:"l-cot", cat:"👶 Little one", name:"Confirm a cot at BOTH hotels", qty:{family:1}, tag:"buy", must:true},
+
+  // ---------- Medication ----------
+  {id:"m-steroid", cat:"🩹 Medication", name:"Rescue oral steroid — mine (prescription)", qty:{me:1}, must:true, note:"packs every holiday"},
+  {id:"m-inhaler", cat:"🩹 Medication", name:"Reliever inhaler + nightly asthma tablet", qty:{partner:1,me:1}},
+  {id:"m-neb", cat:"🩹 Medication", name:"Nebuliser + both neb solutions (prescription)", qty:{bub:"set"}, must:true, note:"cold air is a cough trigger — and you can't buy these there"},
+  {id:"m-panadol", cat:"🩹 Medication", name:"Panadol (adult + kids)", qty:{family:2}},
+  {id:"m-brufen", cat:"🩹 Medication", name:"Brufen", qty:{family:1}},
+  {id:"m-zyrtec", cat:"🩹 Medication", name:"Zyrtec (adult + kids)", qty:{family:2}},
+  {id:"m-telfast", cat:"🩹 Medication", name:"Telfast", qty:{family:1}},
+  {id:"m-cough", cat:"🩹 Medication", name:"Cough syrup", qty:{family:1}},
+  {id:"m-saline", cat:"🩹 Medication", name:"Saline", qty:{family:2}},
+  {id:"m-thermo", cat:"🩹 Medication", name:"Thermometer", qty:{family:1}},
+  {id:"m-syringe", cat:"🩹 Medication", name:"Syringe + medicine cup", qty:{family:1}},
+  {id:"m-plasters", cat:"🩹 Medication", name:"Plasters", qty:{family:10}},
+  {id:"m-antiseptic", cat:"🩹 Medication", name:"Antiseptic cream", qty:{family:1}},
+  {id:"m-motion", cat:"🩹 Medication", name:"Motion sickness (kids)", qty:{family:"set"}, must:true, lastmin:true, note:"two flights + a 2-hour van ride each way if the water-town day happens"},
+  {id:"m-tummy", cat:"🩹 Medication", name:"Traveller's-tummy kit (Imodium · ORS ×5 · charcoal)", qty:{family:"set"}},
+  {id:"m-hydration", cat:"🩹 Medication", name:"Hydration sachets", qty:{family:4}},
+  {id:"m-partner", cat:"🩹 Medication", name:"Daflon (as needed)", qty:{partner:"set"}, note:"his, not mine"},
+  {id:"m-period", cat:"🩹 Medication", name:"Period supplies + magnesium", qty:{me:"set"}},
+
+  // ---------- Eating & snacks ----------
+  {id:"e-uht", cat:"🍽 Eating & snacks", name:"Packet UHT milk", qty:{bub:16}, note:"days × 2"},
+  {id:"e-bottles", cat:"🍽 Eating & snacks", name:"Milk bottles", qty:{bub:2}, must:true},
+  {id:"e-rack", cat:"🍽 Eating & snacks", name:"Bottle rack + brush", qty:{family:1}, must:true},
+  {id:"e-formula", cat:"🍽 Eating & snacks", name:"Formula tin — enough for 8 days", qty:{bub:1}},
+  {id:"e-detergent", cat:"🍽 Eating & snacks", name:"Travel dish detergent", qty:{family:1}},
+  {id:"e-veggiewash", cat:"🍽 Eating & snacks", name:"Veggie wash", qty:{family:1}},
+  {id:"e-coffee", cat:"🍽 Eating & snacks", name:"Coffee / matcha sachets", qty:{family:16}, note:"days × 2"},
+  {id:"e-scissors", cat:"🍽 Eating & snacks", name:"Travel scissors", qty:{family:1}, note:"checked bag"},
+  {id:"e-snackbox", cat:"🍽 Eating & snacks", name:"Plane snack box", qty:{family:1}, must:true, lastmin:true, note:"grapes, animal biscuits, fruit pouches, pretzels, granola bars — in the cabin bag"},
+  {id:"e-waterbottles", cat:"🍽 Eating & snacks", name:"Reusable water bottles", qty:{family:5}, note:"fill after security"},
+  {id:"e-rubbish", cat:"🍽 Eating & snacks", name:"Rubbish bags", qty:{family:3}},
+  {id:"e-sickbags", cat:"🍽 Eating & snacks", name:"Sick bags", qty:{family:2}},
+
+  // ---------- Flight + strollers ----------
+  {id:"f-strollers", cat:"✈️ Flight + strollers", name:"Reclining strollers", qty:{family:2}, must:true, note:"don't rent at the park — theirs don't recline. Gate-check"},
+  {id:"f-covers", cat:"✈️ Flight + strollers", name:"Stroller rain covers + footmuffs/blankets", qty:{family:2}},
+  {id:"f-coats", cat:"✈️ Flight + strollers", name:"Coats in the carry-on", qty:{family:5}, must:true, lastmin:true, note:"32 °C at home, ~10 °C on landing"},
+  {id:"f-tee", cat:"✈️ Flight + strollers", name:"A tee each in the carry-on for the flight home", qty:{partner:1,me:1,boy:1,girl:1,bub:1}, note:"change before landing at home"},
+  {id:"f-neck", cat:"✈️ Flight + strollers", name:"Neck pillows", qty:{boy:1,girl:1,bub:1}},
+  {id:"f-comfort", cat:"✈️ Flight + strollers", name:"Little one's comfort item — within reach, not packed", qty:{bub:1}, must:true, lastmin:true},
+  {id:"f-spareclothes", cat:"✈️ Flight + strollers", name:"Spare change of clothes — in the cabin bag", qty:{bub:1}, must:true},
+  {id:"f-cabinkit", cat:"✈️ Flight + strollers", name:"Cabin kit: tissues, wipes, rubbish + sick bags", qty:{family:1}},
+  {id:"f-liquids", cat:"✈️ Flight + strollers", name:"Liquids ≤100 ml in a clear bag · medicines in the cabin, boxed", qty:{partner:1,me:1}},
+  {id:"f-powerbank", cat:"✈️ Flight + strollers", name:"Power banks in the CABIN only", qty:{family:2}, must:true, note:"never in checked bags; no using or charging them onboard"},
+  {id:"p-rule", cat:"🎒 Plane activities", name:"One pouch per child — hand out ONE new thing per flight hour", qty:{boy:1,girl:1,bub:1}, must:true, note:"5 hrs out, 6 hrs home · the meal counts as one · seat-back films for the second half"},
+  {id:"p-puzzle", cat:"🎒 Plane activities", name:"Puzzle book (mazes, sudoku, logic)", qty:{boy:1}},
+  {id:"p-chess", cat:"🎒 Plane activities", name:"Magnetic travel chess + chess-puzzle book", qty:{boy:1}},
+  {id:"p-mosaic", cat:"🎒 Plane activities", name:"Sticker-mosaic book", qty:{girl:1}},
+  {id:"p-bracelet", cat:"🎒 Plane activities", name:"Bracelet kit — thread only, no beads", qty:{girl:1}},
+  {id:"p-scratch", cat:"🎒 Plane activities", name:"Scratch-art notebook", qty:{girl:1}},
+  {id:"p-journal", cat:"🎒 Plane activities", name:"Trip journal + pencil (flight home: stick in tickets, draw the best day)", qty:{boy:1,girl:1}},
+  {id:"p-waterwow", cat:"🎒 Plane activities", name:"Water Wow pads", qty:{bub:2}},
+  {id:"p-stickers", cat:"🎒 Plane activities", name:"Reusable sticker pad", qty:{bub:1}},
+  {id:"p-flap", cat:"🎒 Plane activities", name:"Lift-the-flap books", qty:{bub:2}},
+  {id:"p-clings", cat:"🎒 Plane activities", name:"Window gel clings", qty:{bub:1}, note:"stick on the plane window, peel, restick"},
+  {id:"p-magboard", cat:"🎒 Plane activities", name:"Magnetic drawing board", qty:{bub:1}},
+  {id:"p-headphones", cat:"🎒 Plane activities", name:"Kids' headphones", qty:{bub:1}},
+  {id:"p-cards", cat:"🎒 Plane activities", name:"Uno + Spot It! + glue stick", qty:{family:1}},
+
+  // ---------- Electronics ----------
+  {id:"x-phones", cat:"🔌 Electronics", name:"Phones + chargers", qty:{family:5}, lastmin:true},
+  {id:"x-laptop", cat:"🔌 Electronics", name:"Laptop", qty:{me:1}},
+  {id:"x-adapters", cat:"🔌 Electronics", name:"Plug adapters", qty:{family:3}, must:true},
+  {id:"x-extension", cat:"🔌 Electronics", name:"Extension cord", qty:{family:1}, must:true, note:"turns one adapter into five sockets"},
+  {id:"x-headphones", cat:"🔌 Electronics", name:"Headphones", qty:{family:4}},
+  {id:"x-players", cat:"🔌 Electronics", name:"Kids' music players", qty:{family:2}},
+  {id:"x-tablets", cat:"🔌 Electronics", name:"Tablets with shows DOWNLOADED", qty:{family:2}, must:true, lastmin:true, note:"streaming apps won't work there without a VPN"},
+  {id:"x-whitenoise", cat:"🔌 Electronics", name:"White-noise machine", qty:{family:1}},
+  {id:"x-camera", cat:"🔌 Electronics", name:"Camera + cable", qty:{family:1}},
+  {id:"x-cables", cat:"🔌 Electronics", name:"Cables kit (USB-C ×2, Lightning, laptop)", qty:{family:1}},
+
+  // ---------- Sleep ----------
+  {id:"z-comfort", cat:"💤 Sleep", name:"Comfort item — all three kids", qty:{boy:1,girl:1,bub:1}, must:true, lastmin:true},
+  {id:"z-books", cat:"💤 Sleep", name:"Bedtime books", qty:{boy:1,girl:1,bub:1}},
+  {id:"z-blackout", cat:"💤 Sleep", name:"Blackout clips", qty:{family:3}},
+
+  // ---------- Flights + downtime ----------
+  {id:"g-cards", cat:"🎮 Flights + downtime", name:"Card games (Uno, Monopoly Deal)", qty:{family:2}},
+  {id:"g-pencils", cat:"🎮 Flights + downtime", name:"Colour pencils + paper on a clipboard", qty:{family:1}},
+  {id:"g-audio", cat:"🎮 Flights + downtime", name:"Audiobooks / playlists — DOWNLOADED", qty:{family:1}, note:"music streaming needs the VPN there"},
+  {id:"g-books", cat:"🎮 Flights + downtime", name:"Books", qty:{partner:1,me:1,boy:1,girl:1,bub:1}},
+
+  // ---------- Documents & money ----------
+  {id:"d-passports", cat:"📄 Documents & money", name:"Passports", qty:{family:5}, must:true, note:"carried every park day — the gate scans the passport itself. No visa needed"},
+  {id:"d-flights", cat:"📄 Documents & money", name:"Flight booking", qty:{family:1}, must:true},
+  {id:"d-travelins", cat:"📄 Documents & money", name:"Travel insurance policy — saved offline", qty:{family:1}, must:true},
+  {id:"d-hotels", cat:"📄 Documents & money", name:"Both hotel confirmations", qty:{family:2}, must:true},
+  {id:"d-park", cat:"📄 Documents & money", name:"Theme-park tickets (linked to passports)", qty:{family:1}, must:true},
+  {id:"d-bookings", cat:"📄 Documents & money", name:"Bookings saved offline: banquet · duck dinner · museum · spa · transfers · water-town tickets", qty:{family:1}},
+  {id:"d-pay", cat:"📄 Documents & money", name:"Mobile wallet working + cards + small cash", qty:{family:1}, must:true},
+  {id:"d-vpn", cat:"📄 Documents & money", name:"VPN + eSIM tested", qty:{family:1}, must:true},
+  {id:"d-banks", cat:"📄 Documents & money", name:"Notify banks of travel", qty:{family:1}, tag:"buy", note:"if your card blocks foreign use"},
+  {id:"d-map", cat:"📄 Documents & money", name:"Offline maps", qty:{family:1}, note:"Apple Maps works there without a VPN; Google Maps doesn't"},
+
+  // ---------- Home ----------
+  {id:"h-pet", cat:"🏠 Home, before you go", name:"Pet care arranged + meds and feeding notes handed over", qty:{family:1}, must:true},
+  {id:"h-tanks", cat:"🏠 Home, before you go", name:"Fish tanks — 8-day holiday prep", qty:{family:1}, must:true, note:"longer than last trip — plan it the week before"},
+  {id:"h-fridge", cat:"🏠 Home, before you go", name:"Bins out · fridge cleared", qty:{family:1}, lastmin:true},
+];
+
+// ---------- RENDER MATRIX VIEW ----------
+function renderMatrix() {
+  const root = document.getElementById('matrix-view');
+  root.innerHTML = '';
+  const cats = [...new Set(ITEMS.map(i => i.cat))];
+  cats.forEach(cat => {
+    const catItems = ITEMS.filter(i => i.cat === cat);
+    const head = document.createElement('div');
+    head.className = 'cat-head';
+    head.innerHTML = `<span>${cat}</span><span class="ct">${catItems.length} item${catItems.length>1?'s':''}</span>`;
+    head.dataset.cat = cat;
+    root.appendChild(head);
+
+    const wrap = document.createElement('div');
+    wrap.style.overflowX = 'auto';
+    wrap.style.marginBottom = '0.5rem';
+
+    const table = document.createElement('table');
+    table.className = 'matrix';
+    let thead = '<thead><tr><th class="col-check"></th><th class="col-item">Item</th>';
+    PEOPLE.forEach(p => thead += `<th>${p.short}</th>`);
+    thead += '<th class="col-must"></th></tr></thead>';
+    let tbody = '<tbody>';
+    catItems.forEach(it => {
+      const classes = ['matrix-row'];
+      if (it.tag === 'buy') classes.push('buy');
+      if (it.must) classes.push('must');
+      if (it.lastmin) classes.push('lastmin');
+      tbody += `<tr class="${classes.join(' ')}" data-id="${it.id}">`;
+      tbody += `<td class="col-check" data-mark-all="1"><div class="box"></div></td>`;
+      tbody += `<td class="col-item">${it.name}${it.note?`<span class="note">${it.note}</span>`:''}</td>`;
+      PEOPLE.forEach(p => {
+        const v = it.qty[p.key];
+        if (v === undefined || v === null || v === 0) {
+          tbody += `<td class="empty">·</td>`;
+        } else {
+          const cls = p.key === 'family' ? 'qty qty-fam' : 'qty';
+          tbody += `<td class="${cls}" data-cell="${p.key}">${v}</td>`;
+        }
+      });
+      tbody += `<td class="col-must"></td>`;
+      tbody += `</tr>`;
+    });
+    tbody += '</tbody>';
+    table.innerHTML = thead + tbody;
+    wrap.appendChild(table);
+    root.appendChild(wrap);
+  });
+}
+
+// ---------- RENDER PERSON VIEW ----------
+let currentPerson = 'family';
+function renderPersonTabs() {
+  const tabs = document.getElementById('person-tabs');
+  tabs.innerHTML = '';
+  PEOPLE.forEach(p => {
+    const personItems = ITEMS.filter(i => {
+      const v = i.qty[p.key];
+      return v !== undefined && v !== null && v !== 0;
+    });
+    const total = personItems.length;
+    const packed = personItems.filter(i => isCellDone(i.id, p.key)).length;
+    const btn = document.createElement('button');
+    btn.dataset.p = p.key;
+    btn.textContent = `${p.label} ${packed}/${total}`;
+    if (p.key === currentPerson) btn.classList.add('active');
+    if (packed === total && total > 0) btn.classList.add('all-packed');
+    btn.addEventListener('click', () => {
+      currentPerson = p.key;
+      renderPersonTabs();
+      renderPersonList();
+    });
+    tabs.appendChild(btn);
+  });
+}
+
+function renderPersonList() {
+  const root = document.getElementById('person-list');
+  root.innerHTML = '';
+  const personItems = ITEMS.filter(i => {
+    const v = i.qty[currentPerson];
+    return v !== undefined && v !== null && v !== 0;
+  });
+  const cats = [...new Set(personItems.map(i => i.cat))];
+  cats.forEach(cat => {
+    const catItems = personItems.filter(i => i.cat === cat);
+    const sec = document.createElement('div');
+    sec.className = 'person-cat';
+    sec.dataset.cat = cat;
+    let html = `<div class="ph"><span>${cat}</span><span class="pc">${catItems.length} item${catItems.length>1?'s':''}</span></div><ul>`;
+    catItems.forEach(it => {
+      const classes = ['person-row'];
+      if (it.tag === 'buy') classes.push('buy');
+      if (it.must) classes.push('must');
+      if (it.lastmin) classes.push('lastmin');
+      const v = it.qty[currentPerson];
+      const badges = `${it.tag === 'buy' ? '<span class="badge badge-buy">to buy</span>' : ''}${it.must ? '<span class="badge badge-must">⭐ must</span>' : ''}${it.lastmin ? '<span class="badge badge-lastmin">⏰ last min</span>' : ''}`;
+      html += `<li class="${classes.join(' ')}" data-id="${it.id}">`;
+      html += `<div class="box"></div>`;
+      html += `<div class="text"><span class="qty">${v} ×</span>${it.name}${badges}</div>`;
+      html += `</li>`;
+    });
+    html += '</ul>';
+    sec.innerHTML = html;
+    root.appendChild(sec);
+  });
+  applyState();
+  applyFilter();
+}
+
+// ---------- STATE / INTERACTION ----------
+function getState() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; } }
+function setState(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch {} }
+
+function cellsForItem(item) {
+  return Object.keys(item.qty).filter(pk => {
+    const v = item.qty[pk];
+    return v !== undefined && v !== null && v !== 0;
+  });
+}
+
+function isCellDone(itemId, pk) {
+  const s = getState();
+  return !!(s[itemId] && s[itemId][pk]);
+}
+
+function itemRowStatus(item) {
+  // 'none' | 'partial' | 'all'
+  const cells = cellsForItem(item);
+  if (cells.length === 0) return 'none';
+  const doneCount = cells.filter(pk => isCellDone(item.id, pk)).length;
+  if (doneCount === 0) return 'none';
+  if (doneCount === cells.length) return 'all';
+  return 'partial';
+}
+
+function toggleCell(itemId, pk) {
+  const s = getState();
+  if (!s[itemId]) s[itemId] = {};
+  s[itemId][pk] = !s[itemId][pk];
+  if (!s[itemId][pk]) delete s[itemId][pk];
+  if (Object.keys(s[itemId]).length === 0) delete s[itemId];
+  setState(s);
+  applyState();
+  applyFilter();
+}
+
+function toggleAllForItem(itemId) {
+  const item = ITEMS.find(i => i.id === itemId);
+  if (!item) return;
+  const cells = cellsForItem(item);
+  const status = itemRowStatus(item);
+  const s = getState();
+  if (status === 'all') {
+    delete s[itemId];
+  } else {
+    s[itemId] = {};
+    cells.forEach(pk => { s[itemId][pk] = true; });
+  }
+  setState(s);
+  applyState();
+  applyFilter();
+}
+
+function updateProgress() {
+  let total = 0, done = 0;
+  ITEMS.forEach(it => {
+    const cells = cellsForItem(it);
+    total += cells.length;
+    cells.forEach(pk => { if (isCellDone(it.id, pk)) done++; });
+  });
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  document.getElementById('pct').textContent = pct + '%';
+  document.getElementById('fill').style.width = pct + '%';
+}
+
+function applyState() {
+  // Matrix: per-cell + per-row visual state
+  document.querySelectorAll('#matrix-view tbody tr').forEach(tr => {
+    const itemId = tr.dataset.id;
+    const item = ITEMS.find(i => i.id === itemId);
+    if (!item) return;
+    tr.querySelectorAll('td.qty').forEach(td => {
+      const pk = td.dataset.cell;
+      if (isCellDone(itemId, pk)) td.classList.add('cell-done');
+      else td.classList.remove('cell-done');
+    });
+    const status = itemRowStatus(item);
+    tr.classList.toggle('done', status === 'all');
+    tr.classList.toggle('partial', status === 'partial');
+  });
+  // Per-person list: each row reflects (item, currentPerson)
+  document.querySelectorAll('.person-cat li').forEach(li => {
+    li.classList.toggle('done', isCellDone(li.dataset.id, currentPerson));
+  });
+  if (document.getElementById('person-tabs')) renderPersonTabs();
+  updateProgress();
+}
+
+function resetAll() {
+  if (!confirm('Reset all checkboxes?')) return;
+  localStorage.removeItem(STORE_KEY);
+  applyState();
+  applyFilter();
+}
+
+document.addEventListener('click', (e) => {
+  // Matrix: leftmost ✓ column = mark every person on the row
+  const markAll = e.target.closest('#matrix-view td[data-mark-all]');
+  if (markAll) { toggleAllForItem(markAll.closest('tr').dataset.id); return; }
+  // Matrix: tap one person's qty cell
+  const cell = e.target.closest('#matrix-view td.qty');
+  if (cell) { toggleCell(cell.closest('tr').dataset.id, cell.dataset.cell); return; }
+  // Per-person view: tap a row toggles only that person
+  const li = e.target.closest('.person-cat li');
+  if (li) { toggleCell(li.dataset.id, currentPerson); return; }
+});
+
+document.querySelectorAll('.bar button.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const v = btn.dataset.view;
+    document.querySelectorAll('.bar button.tab').forEach(b => b.classList.toggle('active', b === btn));
+    document.getElementById('matrix-view').hidden = v !== 'matrix';
+    document.getElementById('person-view').hidden = v !== 'person';
+    if (v === 'person') { renderPersonList(); }
+    applyFilter();
+  });
+});
+
+let currentFilter = 'all';
+function applyFilter() {
+  document.querySelectorAll('#matrix-view tbody tr').forEach(tr => {
+    const done = tr.classList.contains('done');
+    const buy = tr.classList.contains('buy');
+    const must = tr.classList.contains('must');
+    const lastmin = tr.classList.contains('lastmin');
+    let show = true;
+    if (currentFilter === 'topack') show = !done;
+    else if (currentFilter === 'done') show = done;
+    else if (currentFilter === 'buy') show = buy;
+    else if (currentFilter === 'must') show = must;
+    else if (currentFilter === 'lastmin') show = lastmin;
+    tr.hidden = !show;
+  });
+  document.querySelectorAll('#matrix-view .cat-head').forEach(h => {
+    const cat = h.dataset.cat;
+    const visible = [...document.querySelectorAll(`#matrix-view tbody tr:not([hidden])`)].some(tr => {
+      const item = ITEMS.find(i => i.id === tr.dataset.id);
+      return item && item.cat === cat;
+    });
+    h.hidden = !visible;
+    h.nextElementSibling.hidden = !visible;
+  });
+
+  document.querySelectorAll('.person-cat li').forEach(li => {
+    const done = li.classList.contains('done');
+    const buy = li.classList.contains('buy');
+    const must = li.classList.contains('must');
+    const lastmin = li.classList.contains('lastmin');
+    let show = true;
+    if (currentFilter === 'topack') show = !done;
+    else if (currentFilter === 'done') show = done;
+    else if (currentFilter === 'buy') show = buy;
+    else if (currentFilter === 'must') show = must;
+    else if (currentFilter === 'lastmin') show = lastmin;
+    li.hidden = !show;
+  });
+  document.querySelectorAll('.person-cat').forEach(sec => {
+    const visible = sec.querySelectorAll('li:not([hidden])').length;
+    sec.hidden = visible === 0;
+  });
+}
+
+document.querySelectorAll('.bar .filters button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentFilter = btn.dataset.f;
+    document.querySelectorAll('.bar .filters button').forEach(b => b.classList.toggle('active', b === btn));
+    applyFilter();
+  });
+});
+
+renderMatrix();
+renderPersonTabs();
+renderPersonList();
+applyState();
+</script>
+
+</body>
+</html>
